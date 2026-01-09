@@ -7,18 +7,21 @@ from django.shortcuts import render
 from app.views import metrics
 
 
-locale.setlocale(locale.LC_TIME, 'pt_BR.utf8')
-
-
 @login_required(login_url='login')
 def home(request):
     sales_metrics = metrics.get_sales_metrics()
     commissions_metrics = metrics.get_commissions_metrics()
 
     today = date.today()
-    current_month_name = today.strftime("%B")
+
+    MESES_PT = [
+    "", "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+    "Jul", "Ago", "Set", "Out", "Nov", "Dez"
+    ]
+
+    current_month_name = MESES_PT[today.month]
     next_month_date = today + relativedelta(months=1)
-    next_month_name = next_month_date.strftime("%B")
+    next_month_name = MESES_PT[next_month_date.month]
 
     daily_sales_data = metrics.get_daily_sales_data()
     monthly_sales_last_12_months = metrics.get_monthly_sales_last_12_months()
