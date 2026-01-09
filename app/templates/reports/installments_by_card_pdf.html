@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Parcelas por Cartão</title>
+</head>
+
+<body>
+
+<h3>Parcelas por Cartão</h3>
+
+<h4><strong>Cartão: </strong>{{ installments.0.sale.card.title }}</h4>
+
+{% if selected_card %}
+
+    {% if selected_month_date %}
+
+        <h4>{{ selected_month_date|date:"F / Y" }}</h4>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Parcela</th>
+                    <th>Cliente</th>
+                    <th>Venda</th>
+                    <th>Data Vencimento</th>
+                    <th>Valor</th>
+                    <th>Comissão</th>
+                    <th>Valor Total</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for installment in installments %}
+                <tr>
+                    <td class="text-center">
+                        {{ installment.number }}/{{ installment.sale.installment_quantity }}
+                    </td>
+                    <td>{{ installment.sale.customer.name }}</td>
+                    <td>{{ installment.sale.title }}</td>
+                    <td class="text-center">{{ installment.due_date|date:"d/m/Y" }}</td>
+                    <td class="text-end">{{ installment.amount|floatformat:2 }}</td>
+                    <td class="text-end">{{ installment.commission_value|floatformat:2 }}</td>
+                    <td class="text-end">{{ installment.amount_total|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+            <tfoot>
+                <tr>
+                    <th colspan="6">Total do mês</th>
+                    <th class="text-end">{{ total_amount_month|floatformat:2 }}</th>
+                </tr>
+            </tfoot>
+        </table>
+
+    {% else %}    
+
+        {% for month, data in grouped_installments.items %}
+            <h4>{{ month|date:"F / Y" }}</h4>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parcela</th>
+                        <th>Cliente</th>
+                        <th>Venda</th>
+                        <th>Data Vencimento</th>
+                        <th>Valor</th>
+                        <th>Comissão</th>
+                        <th>Valor Total</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for installment in data.items %}
+                        <tr>
+                            <td class="text-center">
+                                {{ installment.number }}/{{ installment.sale.installment_quantity }}
+                            </td>
+                            <td>{{ installment.sale.customer.name }}</td>
+                            <td>{{ installment.sale.title }}</td>
+                            <td class="text-center">{{ installment.due_date|date:"d/m/Y" }}</td>
+                            <td class="text-end">{{ installment.amount|floatformat:2 }}</td>
+                            <td class="text-end">{{ installment.commission_value|floatformat:2 }}</td>
+                            <td class="text-end">{{ installment.amount_total|floatformat:2 }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <th colspan="6" class="text-end">Total do mês</th>
+                        <th class="text-end">{{ data.total }}</th>
+                    </tr>
+                </tfoot>
+            </table>
+        {% endfor %}
+
+    {% endif %}
+
+{% endif %}
+
+</body>
+</html>

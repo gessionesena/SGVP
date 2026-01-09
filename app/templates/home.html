@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% block title %} SGVP - Dashboard {% endblock %}
+{% block content %}
+
+    {% include 'components/_sales_metrics.html' %}
+    {% include 'components/_commissions_metrics.html' %}
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <div class="row mt-4 justify-content-center">
+
+        <div class="col-md-6 text-center">
+            <h5 class="text-center mb-3">Valor de Vendas Diárias (últimos 30 dias)</h5>
+            <canvas id="dailySalesChart"></canvas>
+        </div>
+
+        <div class="col-md-6 text-center">
+            <h5 class="text-center mb-3">Valor de Vendas Mensais (últimos 12 Meses)</h5>
+            <canvas id="monthlySalesLast12MonthChart"></canvas>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function(){
+                var dailySalesData = JSON.parse('{{ daily_sales_data|safe }}');
+                var monthlySalesDataLast12Months = JSON.parse('{{ monthly_sales_last_12_months|safe }}');
+
+                var ctxDailySales = document.getElementById('dailySalesChart').getContext('2d');
+                var dailySalesChart = new Chart(ctxDailySales, {
+                    type: 'line',
+                    data: {
+                        labels: dailySalesData.dates,
+                        datasets: [{
+                            label: 'Valor de Vendas Diárias',
+                            data: dailySalesData.values,
+                            fill: false,
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2,
+                            tension: 0.5
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero:true
+                            }
+                        }
+                    }
+                });
+
+                var ctxMonthlySales = document.getElementById('monthlySalesLast12MonthChart').getContext('2d');
+                var monthlySalesChart = new Chart(ctxMonthlySales, {
+                    type: 'bar',
+                    data: {
+                        labels: monthlySalesDataLast12Months.dates,
+                        datasets: [{
+                            label: 'Valor de Vendas Mensais',
+                            data: monthlySalesDataLast12Months.values,
+                            backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                            beginAtZero: true
+                            }
+                        }
+                    }
+                });
+
+            });
+        </script>
+
+    </div>
+
+    <hr>
+
+    <div class="row mt-4 justify-content-center">
+
+        <div class="col-md-6 text-center">
+            <h5 class="mb-3">Total Vendas por Categoria</h5>
+            <div class="mb-4"></div>
+            <div class="embed-responsive embed-responsive-1by1" style="width: 400px; display: inline-block;">
+                <canvas id="saleByCategoryChart" class="embed-responsive-item"></canvas>
+            </div>
+        </div>
+
+
+        <div class="col-md-6 text-center">
+            <h5 class="mb-3">Fatura à Vencer por Cartão</h5>
+            <div class="mb-4"></div>
+            <div style="width: 400px; display: inline-block;">
+                <canvas id="installmentNextDueByCardChart" class="embed-responsive-item"></canvas>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function(){
+                var saleCountByCategory = JSON.parse('{{ sale_count_by_category|safe }}');
+                var installmentNextDueByCard = JSON.parse('{{ installment_next_due_by_card|safe }}');
+
+                var ctxCategory = document.getElementById('saleByCategoryChart').getContext('2d');
+                var saleByCategoryChart = new Chart(ctxCategory, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(saleCountByCategory),
+                        datasets: [{
+                            data: Object.values(saleCountByCategory),
+                            borderWidth: 1,
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            legend: {
+                                display:false
+                            }
+                        }
+                    }
+                });
+
+                var ctxInstallmentByCard = document.getElementById('installmentNextDueByCardChart').getContext('2d');
+                var installmentNextDueByCardChart = new Chart(ctxInstallmentByCard, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(installmentNextDueByCard),
+                        datasets: [{
+                            data: Object.values(installmentNextDueByCard),
+                            borderWidth: 1,
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            legend: {
+                                display:false
+                            }
+                        }
+                    }
+                });
+
+            });
+        </script>
+
+    </div>
+
+    <hr>
+
+    <div class="row mt-4 justify-content-center">
+
+        <div class="col-md-6 text-center">
+            <h5 class="mb-3">Valor Vendas por Cliente ({{ current_month_name|title }})</h5>
+            <div class="mb-4"></div>
+            <div class="embed-responsive embed-responsive-1by1" style="width: 400px; display: inline-block;">
+                <canvas id="saleByCustomerChart" class="embed-responsive-item"></canvas>
+            </div>
+        </div>
+
+        <div class="col-md-6 text-center">
+            <h5 class="mb-3">Valor Vendas por Cartão ({{ current_month_name|title }})</h5>
+            <div class="mb-4"></div>
+            <div style="width: 400px; display: inline-block;">
+                <canvas id="saleCurrentMonthByCardChart" class="embed-responsive-item"></canvas>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function(){
+                var saleValueCurrentByCustomer = JSON.parse('{{ sale_value_current_month_by_customer|safe }}');
+                var saleValueCurrentMonthByCard = JSON.parse('{{ sale_value_current_month_by_card|safe }}');
+
+                var ctxCustomer = document.getElementById('saleByCustomerChart').getContext('2d');
+                var saleByCustomerChart = new Chart(ctxCustomer, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(saleValueCurrentByCustomer),
+                        datasets: [{
+                            data: Object.values(saleValueCurrentByCustomer),
+                            borderWidth: 1,
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            legend: {
+                                display:false
+                            }
+                        }
+                    }
+                });
+
+                var ctxCard = document.getElementById('saleCurrentMonthByCardChart').getContext('2d');
+                var saleCurrentMonthByCardChart = new Chart(ctxCard, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(saleValueCurrentMonthByCard),
+                        datasets: [{
+                            data: Object.values(saleValueCurrentMonthByCard),
+                            borderWidth: 1,
+                        }]
+                    },
+                    options: {
+                        cutout: '50%',
+                        plugins: {
+                            legend: {
+                                display:false
+                            }
+                        }
+                    }
+                });
+
+            });
+        </script>
+
+    </div>
+
+{% endblock %}

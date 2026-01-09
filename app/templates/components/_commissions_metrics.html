@@ -1,0 +1,42 @@
+
+<div class=" card mt-1">
+    <div class="card-body">
+        <div class="row">
+
+
+            <div class="col-md-4">
+                <div class="card bg-danger bg-opacity-75 text-center">
+                    <div class="card-body">
+                        <h6 class="card-title"> Comissões de {{ current_month_name|title }}</h6>
+                        <p class="card-text text-white font-weight-bold display-6">
+                            {{ commissions_metrics.total_commission_current_month }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card bg-danger bg-opacity-50 text-center">
+                    <div class="card-body">
+                        <h6 class="card-title"> Comissões de {{ next_month_name|title }}</h6>
+                        <p class="card-text text-white font-weight-bold display-6">
+                            R$ {{ commissions_metrics.total_commission_next_month }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card bg-danger bg-opacity-25 text-center">
+                    <div class="card-body">
+                        <h6 class="card-title">Total Geral de Comissões</h6>
+                        <p class="card-text text-white font-weight-bold display-6">
+                            R$ {{ commissions_metrics.total_commission }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

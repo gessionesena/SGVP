@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h3 class="text-center mb-4">Parcelas por Venda</h3>
+    
+    <form method="get" class="row mb-4">
+        <div class="col-md-6">
+            <select name="sale" class="form-select" onchange="this.form.submit()">
+                <option value="">Selecione uma venda</option>
+                {% for sale in sales %}
+                    <option value="{{ sale.id }}"
+                        {% if sale.id|stringformat:"s" == selected_sale %}selected{% endif %}
+                    >
+                        #{{ sale.id }} - {{ sale.title }} | {{ sale.customer }} | {{ sale.sale_date|date:"d/m/Y" }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+    {% if selected_sale %}
+
+        <a href="?sale={{ selected_sale }}&pdf=1"
+        class="btn btn-danger mb-3" target="_blank">
+            <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+        </a>
+
+        {% if installments %}
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr class="text-center">
+                    <th>Parcela</th>
+                    <th>Data Vencimento</th>
+                    <th>Valor</th>
+                    <th>Comissão</th>
+                    <th>Valor Total</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for installment in installments %}
+                <tr>
+                    <td class="text-center">{{ installment.number }}/{{ installment.sale.installment_quantity }}</td>
+                    <td class="text-center">{{ installment.due_date|date:"d/m/Y" }}</td>
+                    <td class="text-end">{{ installment.amount|floatformat:2 }}</td>
+                    <td class="text-end">{{ installment.commission_value|floatformat:2 }}</td>
+                    <td class="text-end">{{ installment.amount_total|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p class="text-center mt-3 text-secondary">Nenhuma parcela encontrada para esta venda.</p>       
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

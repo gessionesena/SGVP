@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h3 class="text-center mb-4">Parcelas em aberto por Cliente</h3>
+
+    <form method="get" id="filter-form" class="row mb-4">
+        <div class="col-md-4">
+            <label class="form-label">Cliente</label>
+            <select name="customer" class="form-select">
+                <option value="">Selecione um cliente</option>
+                {% for customer in customers %}
+                    <option value="{{ customer.id }}"
+                        {% if customer.id|stringformat:"s" == selected_customer %}selected{% endif %}>
+                        {{ customer.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Mês / Ano</label>
+            <select name="month" class="form-select">
+                <option value="">Todos os meses</option>
+                {% for item in months %}
+                    <option value="{{ item.month|date:'Y-m' }}"
+                        {% if item.month|date:'Y-m' == selected_month %}selected{% endif %}>
+                        {{ item.month|date:'F/Y' }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-funnel"></i>
+            </button>
+        </div>
+    </form>
+
+    {% if error %}
+        <div class="alert alert-warning">{{ error }}</div>
+    {% endif %}
+
+    {% if selected_customer and selected_month and installments %}
+        <!-- FORM DO PDF -->
+        <form method="get" id="pdf-form" target="_blank">
+
+            <input type="hidden" name="customer" value="{{ selected_customer }}">
+            
+            <input type="hidden" name="month" value="{{ selected_month }}">
+            
+            <input type="hidden" name="pdf" value="1">
+
+            <button type="submit"
+            class="btn btn-danger mb-3"
+            id="pdf-btn"
+            {% if selected_month %}disabled{% endif %}>
+                <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+            </button>
+
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr class="text-center">
+                        <th>
+                            <input type="checkbox" id="check-all">
+                        </th>
+                        <th>Parcela</th>
+                        <th>Venda</th>
+                        <th>Vencimento</th>
+                        <th>Valor</th>
+                        <th>Comissão</th>
+                        <th>Total</th>
+                        <th>Saldo Devedor</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for installment in installments %}
+                    <tr>
+                        <td class="text-center">
+                            <input type="checkbox"
+                                class="installment-check"
+                                name="installment_ids"
+                                value="{{ installment.id }}">
+                        </td>
+                        <td class="text-center">
+                            {{ installment.number }}/{{ installment.sale.installment_quantity }}
+                        </td>
+                        <td>{{ installment.sale.title }}</td>
+                        <td class="text-center">{{ installment.due_date|date:"d/m/Y" }}</td>
+                        <td class="text-end">{{ installment.amount|floatformat:2 }}</td>
+                        <td class="text-end">{{ installment.commission_value|floatformat:2 }}</td>
+                        <td class="text-end">{{ installment.amount_total|floatformat:2 }}</td>
+                        <td class="text-end">{{ installment.remaining_balance|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <th colspan="6" class="text-end">Totais</th>
+                        <th class="text-end">{{ total_amount_month|floatformat:2 }}</th>
+                        <th class="text-end">{{ total_balance_month|floatformat:2 }}</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </form>
+
+    {% elif selected_customer and not selected_month and grouped_installments %}
+
+        <a href="?customer={{ selected_customer }}&pdf=1"
+        class="btn btn-danger mb-3" target="_blank">
+            <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+        </a>
+
+        {% for month, data in grouped_installments.items %}
+            <h6 class="mt-4 fw-bold text-primary">
+                <i class="bi bi-calendar3"></i>
+                {{ month|date:"F / Y" }}
+            </h6>
+
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr class="text-center">
+                        <th>Parcela</th>
+                        <th>Venda</th>
+                        <th>Vencimento</th>
+                        <th>Valor</th>
+                        <th>Comissão</th>
+                        <th>Total</th>
+                        <th>Saldo Devedor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inst in data.items %}
+                    <tr>
+                        <td class="text-center">
+                        {{ inst.number }}/{{ inst.sale.installment_quantity }}
+                        </td>
+                        <td>{{ inst.sale.title }}</td>
+                        <td class="text-center">{{ inst.due_date|date:"d/m/Y" }}</td>
+                        <td class="text-end">{{ inst.amount|floatformat:2 }}</td>
+                        <td class="text-end">{{ inst.commission_value|floatformat:2 }}</td>
+                        <td class="text-end">{{ inst.amount_total|floatformat:2 }}</td>
+                        <td class="text-end">{{ inst.remaining_balance|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="5" class="text-end">Total do mês</th>
+                        <th class="text-end">{{ data.total_amount|floatformat:2 }}</th>
+                        <th class="text-end">{{ data.total_balance|floatformat:2 }}</th>
+                    </tr>
+                </tfoot>
+            </table>
+        {% endfor %}
+    
+    {% else %}
+
+        <p class="text-center mt-3 text-secondary">Nenhuma parcela em aberto encontrada para este cliente.</p>         
+
+    {% endif %}
+</div>
+
+
+<script> 
+document.addEventListener('DOMContentLoaded', function () {
+    const checkAll = document.getElementById('check-all');
+    const checks = document.querySelectorAll('.installment-check');
+    const pdfBtn = document.getElementById('pdf-btn');
+
+    if (!pdfBtn) return;
+
+    function toggleButton() {
+        const anyChecked = [...checks].some(c => c.checked);
+        pdfBtn.disabled = !anyChecked;
+    }
+
+    if (checkAll) {
+        checkAll.addEventListener('change', function () {
+            checks.forEach(c => c.checked = this.checked);
+            toggleButton();
+        });
+    }
+
+    checks.forEach(c => {
+        c.addEventListener('change', toggleButton);
+    });
+});
+</script>
+
+{% endblock %}

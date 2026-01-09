@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h3 class="text-center mb-4">Vendas por Categoria</h3>
+    
+    <form method="get" class="row mb-4">
+        <div class="col-md-6">
+            <select name="category" class="form-select" onchange="this.form.submit()">
+                <option value="">Selecione uma categoria</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}"
+                        {% if category.id|stringformat:"s" == selected_category %}selected{% endif %}
+                    >
+                        {{ category.title }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+    {% if selected_category %}
+        {% if sales %}
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr class="text-center">
+                    <th>Título da Venda</th>
+                    <th>Data da Venda</th>
+                    <th>Valor da Venda</th>
+                    <th>Cliente</th>
+                    <th>Cartão</th>
+                    <th>Vencimento(dia)</th>
+                    <th>Quantidade de Parcelas</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for sale in sales %}
+                <tr>
+                    <td>{{ sale.title }}</td>
+                    <td class="text-center">{{ sale.sale_date|date:"d/m/Y" }}</td>
+                    <td class="text-end">{{ sale.selling_price|floatformat:2 }}</td>
+                    <td>{{ sale.customer }}</td>
+                    <td>{{ sale.card }}</td>
+                    <td class="text-center">{{ sale.card.payment_due_day }}</td>
+                    <td class="text-center">{{ sale.installment_quantity }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p class="text-center mt-3 text-secondary">Nenhuma venda encontrada para esta categoria.</p>       
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

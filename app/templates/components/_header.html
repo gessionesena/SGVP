@@ -1,0 +1,16 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand mb-0 h1 text-white" href="{% url 'home' %}">
+            Sistema de Gestão de Vendas e Pagamentos (SGVP)
+        </a>
+
+        <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+            {% if user.is_authenticated %}
+            <span class="navbar-text text-white me-3">
+                <strong>Usuário:</strong> {{ user.get_full_name|default:user.username }}
+            </span>
+            {% endif %}
+        </div>
+
+    </div>
+</nav>

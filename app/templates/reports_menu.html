@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2 class="mb-4 text-center">Relatórios</h2>
+
+    <div class="row g-4">
+
+        <!-- VENDAS -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-1">
+                <div class="card-header text-center" >
+                    <h5 class="mb-0">Vendas</h5>
+                </div>
+                <div class="card-body">
+
+                    <ul class="list-unstyled mb-0">
+
+                        <li class="mb-3">
+                            <a href="{% url 'sales_by_customer_report' %}" class="text-decoration-none">
+                                Vendas por Cliente
+                            </a>
+                        </li>
+
+                        <li class="mb-3">
+                            <a href="{% url 'sales_by_card_report' %}" class="text-decoration-none">
+                                Vendas por Cartão
+                            </a>
+                        </li>
+
+                        <li class="mb-3">
+                            <a href="{% url 'sales_by_category_report' %}" class="text-decoration-none">
+                                Vendas por Categoria
+                            </a>
+                        </li>
+
+                        <li class="mb-3">
+                            <a href="{% url 'installments_by_sale_report' %}" class="text-decoration-none">
+                                Parcelas por Venda
+                            </a>
+                        </li>
+
+                        <li class="mb-3">
+                            <a href="{% url 'installments_by_customer_report' %}" class="text-decoration-none">
+                                Parcelas em aberto por Cliente
+                            </a>
+                        </li>
+
+                        <li class="mb-3">
+                            <a href="{% url 'installments_by_card_report' %}" class="text-decoration-none">
+                                Parcelas por Cartão
+                            </a>
+                        </li>
+
+                        <li class="mb-3">
+                            <a href="{% url 'installments_by_due_date_report' %}" class="text-decoration-none">
+                                Parcelas por Vencimento
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGAMENTOS -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-1">
+                <div class="card-header text-center">
+                    <h5 class="mb-0">Pagamentos</h5>
+                </div>
+                <div class="card-body">
+
+                    <ul class="list-unstyled mb-0">
+
+                        <li class="mb-3">
+                            <a href="{% url 'payments_by_customer_report' %}" class="text-decoration-none">
+                                Pagamentos por Cliente
+                            </a>
+                        </li>
+
+                        <li class="mb-3">
+                            <a href="{% url 'allocations_by_payment_report' %}" class="text-decoration-none">
+                                Alocações por Pagamento
+                            </a>
+                        </li>
+
+                        <li class="mb-3">
+                            <a href="{% url 'allocations_by_installment_report' %}" class="text-decoration-none">
+                                Alocações por Parcela
+                            </a>
+                        </li>
+
+                        <li class="mb-3">
+                            <a href="{% url 'overdue_installments_report' %}" class="text-decoration-none">
+                                Parcelas em Atraso
+                            </a>
+                        </li>
+
+                        <li class="mb-3">
+                            <a href="{% url 'commissions_by_month_report' %}" class="text-decoration-none">
+                                Comissões Mensais
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Parcelas por Venda</title>
+</head>
+
+<body>
+
+<h3>Parcelas por Venda</h3>
+
+<h4><strong>Venda: </strong>{{ installments.0.sale.id }}# {{ installments.0.sale.title }} | {{ installments.0.sale.sale_date|date:"d/m/Y" }}</h4>
+<h4><strong>Cliente: </strong>{{ installments.0.sale.customer.name }}</h4>
+
+{% if selected_sale %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>Parcela</th>
+                <th>Data Vencimento</th>
+                <th>Valor</th>
+                <th>Comissão</th>
+                <th>Valor Total</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for installment in installments %}
+                <tr>
+                    <td class="text-center">{{ installment.number }}/{{ installment.sale.installment_quantity }}</td>
+                    <td class="text-center">{{ installment.due_date|date:"d/m/Y" }}</td>
+                    <td class="text-end">{{ installment.amount|floatformat:2 }}</td>
+                    <td class="text-end">{{ installment.commission_value|floatformat:2 }}</td>
+                    <td class="text-end">{{ installment.amount_total|floatformat:2 }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endif %}
+
+</body>
+</html>

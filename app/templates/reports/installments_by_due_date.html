@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h3 class="text-center mb-4">Parcelas por Vencimento</h3>
+    
+    <form method="get">
+
+        <div class="input-group mb-3">
+            <div class="col-md-3">
+                <label for="start_date" class="form-label">Data inicial</label>
+                <input 
+                    type="date" 
+                    id="start_date" 
+                    name="start_date" 
+                    value="{{ start_date }}" 
+                    class="form-control"
+                >
+            </div>
+
+            <div class="col-md-3">
+                <label for="end_date" class="form-label">Data final</label>
+                <input 
+                    type="date" 
+                    id="end_date" 
+                    name="end_date" 
+                    value="{{ end_date }}"
+                    class="form-control"
+                >
+            </div>
+
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-funnel"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+
+    {% if start_date or end_date %}
+        {% if installments %}
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr class="text-center">
+                    <th>Cliente</th>
+                    <th>Parcela</th>
+                    <th>Venda</th>
+                    <th>Cartão</th>
+                    <th>Data Vencimento</th>
+                    <th>Valor</th>
+                    <th>Comissão</th>
+                    <th>Valor Total</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for installment in installments %}
+                <tr>
+                    <td>{{ installment.sale.customer.name }}</td>
+                    <td>{{ installment.number }}/{{ installment.sale.installment_quantity }}</td>
+                    <td>{{ installment.sale.title }}</td>
+                    <td>{{ installment.sale.card }}</td>
+                    <td class="text-center">{{ installment.due_date|date:"d/m/Y" }}</td>
+                    <td class="text-end">{{ installment.amount|floatformat:2 }}</td>
+                    <td class="text-end">{{ installment.commission_value|floatformat:2 }}</td>
+                    <td class="text-end">{{ installment.amount_total|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p class="text-center mt-3 text-secondary">Nenhuma parcela encontrada para este período/data.</p>       
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

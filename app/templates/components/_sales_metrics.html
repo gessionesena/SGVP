@@ -1,0 +1,55 @@
+<div class="card mt-4">
+    <div class="card-body">
+        <div class="row">
+
+            <div class="col-md-3">
+                <div class="card bg-primary text-center">
+                    <div class="card-body">
+                        <h6 class="card-title"> Quantidade Total de Vendas</h6>
+                        <p class="card-text text-white font-weight-bold display-6">
+                            {{ sales_metrics.total_sales }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-3">
+                <div class="card bg-primary bg-opacity-75 text-center">
+                    <div class="card-body">
+                        <h6 class="card-title"> Custo Total de Vendas</h6>
+                        <p class="card-text text-white font-weight-bold display-6">
+                            R$ {{ sales_metrics.total_sales_cost }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-3">
+                <div class="card bg-primary bg-opacity-50 text-center">
+                    <div class="card-body">
+                        <h6 class="card-title"> Valor Total de Vendas</h6>
+                        <p class="card-text text-white font-weight-bold display-6">
+                            R$ {{ sales_metrics.total_sales_value }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-3">
+                <div class="card bg-primary bg-opacity-25 text-center">
+                    <div class="card-body">
+                        <h6 class="card-title">Lucro Total de Vendas</h6>
+                        <p class="card-text text-white font-weight-bold display-6">
+                            R$ {{ sales_metrics.total_sales_profit }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>

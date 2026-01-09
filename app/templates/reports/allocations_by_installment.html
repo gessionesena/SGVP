@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h3 class="text-center mb-4">Alocações por Parcela</h3>
+    
+    <form method="get" class="row mb-4">
+        <div class="col-md-6">
+            <select name="installment" class="form-select" onchange="this.form.submit()">
+                <option value="">Selecione uma parcela</option>
+                {% for installment in installments %}
+                    <option value="{{ installment.id }}"
+                        {% if installment.id|stringformat:"s" == selected_installment %}selected{% endif %}
+                    >
+                        #{{ installment.id }} - {{ installment.number }}/{{ installment.sale.installment_quantity }} | R$ {{ installment.amount_total }} | {{ installment.due_date|date:"d/m/Y" }} | {{ installment.sale.title }} | {{ installment.sale.customer.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+    {% if selected_installment %}
+        {% if allocations %}
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr class="text-center">
+                    <th>Valor da Alocação</th>
+                    <th>Venda</th>
+                    <th>Cliente</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for allocation in allocations %}
+                <tr>
+                    <td class="text-end">{{ allocation.amount_applied|floatformat:2 }}</td>
+                    <td>{{ allocation.installment.sale.title }}</td>
+                    <td>{{ allocation.payment.customer }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p class="text-center mt-3 text-secondary">Nenhuma alocação encontrada para esta parcela.</p>       
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

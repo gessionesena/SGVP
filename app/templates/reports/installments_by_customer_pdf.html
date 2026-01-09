@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Parcelas em aberto por Cliente</title>
+</head>
+
+<body>
+
+<div class="header-right"><strong>Gerado em: </strong>
+    {{ generated_at|date:"d/m/Y H:i" }}
+</div>
+
+<h3>Parcelas em aberto por Cliente</h3>
+
+<h4><strong>Cliente: </strong>{{ installments.0.sale.customer.name }}</h4>
+
+{% if selected_customer %}
+
+    {% if selected_month_date %}
+
+        <h4>{{ selected_month_date|date:"F / Y" }}</h4>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Parcela</th>
+                    <th>Venda</th>
+                    <th>Vencimento</th>
+                    <th>Valor</th>
+                    <th>Comissão</th>
+                    <th>Total</th>
+                    <th>Saldo Devedor</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for installment in installments %}
+                <tr>
+                    <td class="text-center">
+                        {{ installment.number }}/{{ installment.sale.installment_quantity }}
+                    </td>
+                    <td>{{ installment.sale.title }}</td>
+                    <td class="text-center">{{ installment.due_date|date:"d/m/Y" }}</td>
+                    <td class="text-end">{{ installment.amount|floatformat:2 }}</td>
+                    <td class="text-end">{{ installment.commission_value|floatformat:2 }}</td>
+                    <td class="text-end">{{ installment.amount_total|floatformat:2 }}</td>
+                    <td class="text-end">{{ installment.remaining_balance|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+            <tfoot>
+                <tr>
+                    <th colspan="5">Total do mês</th>
+                    <th class="text-end">{{ total_amount_month|floatformat:2 }}</th>
+                    <th class="text-end">{{ total_balance_month|floatformat:2 }}</th>
+                </tr>
+            </tfoot>
+        </table>
+    {% else %} 
+
+        {% for month, data in grouped_installments.items %}
+            <h4>{{ month|date:"F / Y" }}</h4>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parcela</th>
+                        <th>Venda</th>
+                        <th>Vencimento</th>
+                        <th>Valor</th>
+                        <th>Comissão</th>
+                        <th>Total</th>
+                        <th>Saldo Devedor</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for installment in data.items %}
+                    <tr>
+                        <td class="text-center">
+                            {{ installment.number }}/{{ installment.sale.installment_quantity }}
+                        </td>
+                        <td>{{ installment.sale.title }}</td>
+                        <td class="text-center">{{ installment.due_date|date:"d/m/Y" }}</td>
+                        <td class="text-end">{{ installment.amount|floatformat:2 }}</td>
+                        <td class="text-end">{{ installment.commission_value|floatformat:2 }}</td>
+                        <td class="text-end">{{ installment.amount_total|floatformat:2 }}</td>
+                        <td class="text-end">{{ installment.remaining_balance|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <th colspan="5" class="text-end">Total do mês</th>
+                        <th class="text-end">{{ data.total_amount }}</th>
+                        <th class="text-end">{{ data.total_balance }}</th>
+                    </tr>
+                </tfoot>
+            </table>
+        {% endfor %}
+
+    {% endif %}
+     
+{% endif %}
+
+</body>
+</html>

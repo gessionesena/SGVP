@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h3 class="text-center mb-4">Comissões Mensais</h3>
+    
+    <form method="get" class="row mb-4">
+
+        <div class="col-md-3">
+            <label class="form-label">Mês / Ano</label>
+            <select name="month" class="form-select">
+                <option value="">Todos os meses</option>
+                {% for item in months %}
+                    <option value="{{ item.month|date:'Y-m' }}"
+                        {% if item.month|date:'Y-m' == selected_month %}selected{% endif %}
+                    >
+                        {{ item.month|date:'F/Y' }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-funnel"></i>
+            </button>
+        </div>
+
+    </form>
+
+    {% if not selected_month and grouped_installments %}
+
+        {% for month, data in grouped_installments.items %}
+
+            <h6 class="mt-4 fw-bold text-primary">
+                <i class="bi bi-calendar3"></i>
+                {{ month|date:"F / Y" }}
+            </h6>
+
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr class="text-center">
+                        <th>Cliente</th>
+                        <th>Parcela</th>
+                        <th>Venda</th>
+                        <th>Data Vencimento</th>
+                        <th>Valor da Comissão</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for installment in data.items %}
+                        <tr>
+                            <td>{{ installment.sale.customer.name }}</td>
+                            <td class="text-center">{{ installment.number }}/{{ installment.sale.installment_quantity }}</td>
+                            <td>{{ installment.sale.title }}</td>
+                            <td class="text-center">{{ installment.due_date|date:"d/m/Y" }}</td>
+                            <td class="text-end">{{ installment.commission_value|floatformat:2 }}</td>  
+                        </tr>
+                    {% endfor %}
+                </tbody>
+
+                <tfoot class="table table-bordered table-striped">
+                    <tr>
+                        <th colspan="4" class="text-end">Total do mês</th>
+                        <th class="fw-bold text-end">
+                            {{ data.total_commission }}
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+
+        {% endfor %}
+
+    {% elif installments %}
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr class="text-center">
+                    <th>Cliente</th>
+                    <th>Parcela</th>
+                    <th>Venda</th>
+                    <th>Data Vencimento</th>
+                    <th>Valor da Comissão</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for installment in installments %}
+                    <tr>
+                        <td>{{ installment.sale.customer.name }}</td>
+                        <td class="text-center">{{ installment.number }}/{{ installment.sale.installment_quantity }}</td>
+                        <td>{{ installment.sale.title }}</td>
+                        <td class="text-center">{{ installment.due_date|date:"d/m/Y" }}</td>
+                        <td class="text-end">{{ installment.commission_value|floatformat:2 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+
+            <tfoot>
+                <tr>
+                    <th colspan="4" class="text-end">Total do mês</th>
+                    <th class="text-end">{{ total_commission_month|floatformat:2 }}</th>
+                </tr>
+            </tfoot>
+
+        </table>
+    {% else %}
+        <p class="text-center mt-3 text-secondary">Nenhuma comissão encontrada para este mês.</p>       
+    {% endif %}
+    
+</div>
+{% endblock %}

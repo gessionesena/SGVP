@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div class="container mt-4">
+        <h3 class="display-6">Deletar Alocação de Pagamento</h3>
+
+        <div class="card">
+            <div class="card-body">
+                <p class="card-text">Tem certeza que deseja deletar a Alocação de R$ {{ payments_allocations.amount_applied }} da Parcela <strong>{{ payments_allocations.installment.number }}</strong> da Venda <strong>{{ payments_allocations.installment.sale.title }}</strong>?</p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Deletar</button>
+                </form>
+                {% if from == 'payment' %}
+                    <a href="{% url 'payments_allocations_by_payment' payment.id %}" class="btn btn-secondary mt-3">Cancelar</a>
+                {% elif from == 'installment' %}
+                    <a href="{% url 'payments_allocations_by_installment' installment.id %}" class="btn btn-secondary mt-3">Cancelar</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

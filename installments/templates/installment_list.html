@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}
+SGVP - Parcelas
+{% endblock %}
+
+{% block content %}
+
+{% if sale %}
+    <div class="mb-3">
+        <a href="{% url 'sale_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+    <div class="row mb-3">
+        <h4 class="display-10">Parcelas da Venda #{{ sale.id }} - {{ sale.title }} | {{ sale.customer }}</h4>
+    </div>
+{% endif %}
+
+{% if not sale %}
+    <div class="row mb-3">
+
+        <div class="col-md-6">
+            <form method="get" action="{% url 'installment_list' %}">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="q" placeholder="Buscar por Cliente ou Venda" value="{{ search_term }}">
+
+                    <input type="hidden" name="start_date" value="{{ filter_start_date }}">
+                    <input type="hidden" name="end_date" value="{{ filter_end_date }}">
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+    </div>
+
+
+    <div class="row mb-3">
+
+    <form method="get">
+
+        <input type="hidden" name="q" value="{{ search_term }}">
+
+        <div class="input-group mb-3">
+            <div class="col-md-3">
+                <label for="start_date" class="form-label">Data inicial</label>
+                <input 
+                    type="date" 
+                    id="start_date" 
+                    name="start_date" 
+                    value="{{ filter_start_date }}" 
+                    class="form-control"
+                >
+            </div>
+
+            <div class="col-md-3">
+                <label for="end_date" class="form-label">Data final</label>
+                <input 
+                    type="date" 
+                    id="end_date" 
+                    name="end_date" 
+                    value="{{ filter_end_date }}"
+                    class="form-control"
+                >
+            </div>
+
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-funnel"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+{% endif %}
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark text-center">
+            <tr>
+                <th>ID</th>
+                {% if not sale %}
+                    <th>Venda</th>
+                {% endif %}
+                <th>Parcela</th>
+                <th>Vencimento</th>
+                <th>Valor</th>
+                <th>Comissão</th>
+                <th>Juros</th>
+                <th>Total</th>
+                <th>Saldo Devedor</th>
+                <th>Status</th>
+                {% if sale %}
+                    <th>Ações</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for installment in installments %}
+                <tr>
+                    <td class="text-center">{{ installment.id }}</td>
+                    {% if not sale %}
+                        <td>{{ installment.sale }}</td>
+                    {% endif %}
+                    <td class="text-center">{{ installment.number }}/{{ installment.sale.installment_quantity }}</td>
+                    <td class="text-center">{{ installment.due_date|date:"d/m/Y" }}</td>
+                    <td class="text-end">{{ installment.amount }}</td>
+                    <td class="text-end">{{ installment.commission_value }}</td>
+                    <td class="text-end">{{ installment.late_fee_value }}</td>
+                    <td class="text-end">{{ installment.amount_total }}</td>
+                    <td class="text-end">{{ installment.remaining_balance_installment }}</td>
+                    <td class="text-center">
+                        {% if installment.is_paid_off_installment %}
+                            <span class="badge bg-success">Quitada</span>
+                        {% else %}
+                            <span class="badge bg-warning">Pendente</span>
+                        {% endif %}
+                    </td>
+
+                    {% if sale %}
+                        <td class="text-center">
+                            {% if perms.installments.view_installment %}
+                                <a href="{% url 'installment_detail' installment.id %}" class="btn btn-info btn-sm" title="Detalhes da Parcela">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            {% endif %}    
+
+                            {% if perms.installments.change_installment %}    
+                                <a href="{% url 'installment_update' installment.id %}" class="btn btn-warning btn-sm" title="Editar Parcela">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            {% endif %}    
+
+                            {% if perms.installments.delete_installment %}    
+                                <a href="{% url 'installment_delete' installment.id %}" class="btn btn-danger btn-sm" title="Excluir Parcela">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            {% endif %}    
+
+                            {% if perms.payments_allocations.view_payment_allocation %}    
+                                <a href="{% url 'payments_allocations_by_installment' installment.id %}" class="btn btn-success btn-sm" title="Visualizar Alocações">
+                                    <i class="bi bi-cash-coin"></i>
+                                </a>
+                            {% endif %}
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{%  include 'components/_pagination.html' %}
+
+{% endblock %}

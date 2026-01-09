@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h3 class="text-center mb-4">Parcelas por Cartão</h3>
+    
+    <form method="get" class="row mb-4">
+        <div class="col-md-4">
+            <label class="form-label">Cartão</label>
+            <select name="card" class="form-select">
+                <option value="">Selecione um cartão</option>
+                {% for card in cards %}
+                    <option value="{{ card.id }}"
+                        {% if card.id|stringformat:"s" == selected_card %}selected{% endif %}
+                    >
+                        {{ card.title }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Mês / Ano</label>
+            <select name="month" class="form-select">
+                <option value="">Todos os meses</option>
+                {% for item in months %}
+                    <option value="{{ item.month|date:'Y-m' }}"
+                        {% if item.month|date:'Y-m' == selected_month %}selected{% endif %}
+                    >
+                        {{ item.month|date:'F/Y' }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-funnel"></i>
+            </button>
+        </div>
+
+    </form>
+
+    {% if selected_card %}
+
+        <a href="?card={{ selected_card }}&month={{ selected_month }}&pdf=1"
+        class="btn btn-danger mb-3" target="_blank">
+            <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+        </a>
+
+        {% if not selected_month and grouped_installments %}
+
+            {% for month, data in grouped_installments.items %}
+
+                <h6 class="mt-4 fw-bold text-primary">
+                    <i class="bi bi-calendar3"></i>
+                    {{ month|date:"F / Y" }}
+                </h6>
+
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr class="text-center">
+                            <th>Parcela</th>
+                            <th>Cliente</th>
+                            <th>Venda</th>
+                            <th>Data Vencimento</th>
+                            <th>Valor</th>
+                            <th>Comissão</th>
+                            <th>Valor Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for installment in data.items %}
+                            <tr>
+                                <td class="text-center">{{ installment.number }}/{{ installment.sale.installment_quantity }}</td>
+                                <td>{{ installment.sale.customer.name }}</td>
+                                <td>{{ installment.sale.title }}</td>
+                                <td class="text-center">{{ installment.due_date|date:"d/m/Y" }}</td>
+                                <td class="text-end">{{ installment.amount|floatformat:2 }}</td>
+                                <td class="text-end">{{ installment.commission_value|floatformat:2 }}</td>
+                                <td class="text-end">{{ installment.amount_total|floatformat:2 }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+
+                    <tfoot class="table table-bordered table-striped">
+                        <tr>
+                            <th colspan="6" class="text-end">Total do mês</th>
+                            <th class="fw-bold text-end">
+                                {{ data.total }}
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+            {% endfor %}
+
+        {% elif installments %}
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr class="text-center">
+                        <th>Parcela</th>
+                        <th>Cliente</th>
+                        <th>Venda</th>
+                        <th>Data Vencimento</th>
+                        <th>Valor</th>
+                        <th>Comissão</th>
+                        <th>Valor Total</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for installment in installments %}
+                    <tr>
+                        <td class="text-center">{{ installment.number }}/{{ installment.sale.installment_quantity }}</td>
+                        <td>{{ installment.sale.customer.name }}</td>
+                        <td>{{ installment.sale.title }}</td>
+                        <td class="text-center">{{ installment.due_date|date:"d/m/Y" }}</td>
+                        <td class="text-end">{{ installment.amount|floatformat:2 }}</td>
+                        <td class="text-end">{{ installment.commission_value|floatformat:2 }}</td>
+                        <td class="text-end">{{ installment.amount_total|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+                <tfoot>
+                <tr>
+                    <th colspan="6" class="text-end">Total do mês</th>
+                    <th class="text-end">{{ total_amount_month|floatformat:2 }}</th>
+                </tr>
+            </tfoot>
+
+            </table>
+        {% else %}
+                <p class="text-center mt-3 text-secondary">Nenhuma parcela encontrada para este cartão.</p>       
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
