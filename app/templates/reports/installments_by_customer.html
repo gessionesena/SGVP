@@ -44,7 +44,7 @@
     {% endif %}
 
     {% if selected_customer and selected_month and installments %}
-        <!-- FORM DO PDF -->
+
         <form method="get" id="pdf-form" target="_blank">
 
             <input type="hidden" name="customer" value="{{ selected_customer }}">
@@ -157,7 +157,8 @@
                 </tfoot>
             </table>
         {% endfor %}
-    
+    {% elif not selected_customer %}
+        <p></p>        
     {% else %}
 
         <p class="text-center mt-3 text-secondary">Nenhuma parcela em aberto encontrada para este cliente.</p>         
