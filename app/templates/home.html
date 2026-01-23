@@ -121,7 +121,7 @@
 
                 var ctxInstallmentByCard = document.getElementById('installmentNextDueByCardChart').getContext('2d');
                 var installmentNextDueByCardChart = new Chart(ctxInstallmentByCard, {
-                    type: 'pie',
+                    type: 'doughnut',
                     data: {
                         labels: Object.keys(installmentNextDueByCard),
                         datasets: [{
@@ -170,7 +170,7 @@
 
                 var ctxCustomer = document.getElementById('saleByCustomerChart').getContext('2d');
                 var saleByCustomerChart = new Chart(ctxCustomer, {
-                    type: 'pie',
+                    type: 'doughnut',
                     data: {
                         labels: Object.keys(saleValueCurrentByCustomer),
                         datasets: [{
