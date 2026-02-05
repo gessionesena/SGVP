@@ -3,6 +3,7 @@ from dateutil.relativedelta import relativedelta
 from datetime import date
 from decimal import Decimal, ROUND_HALF_UP
 from django.utils import timezone
+from django.utils.formats import date_format
 from django.utils.formats import number_format
 from django.db.models import Sum, F
 from sales.models import Sale
@@ -93,7 +94,7 @@ def get_monthly_sales_last_12_months():
         month_start = month
         month_end = month + relativedelta(months=1)
 
-        dates.append(month.strftime("%b/%y").title())
+        dates.append(date_format(month, "b/Y").title())
 
         total = (
             Sale.objects.filter(
