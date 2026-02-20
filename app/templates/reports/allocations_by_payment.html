@@ -3,11 +3,17 @@
 {% block content %}
 <div class="container mt-4">
 
+    <div class="mb-3">
+        <a href="{% url 'reports_menu' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
     <h3 class="text-center mb-4">Alocações por Pagamentos</h3>
     
     <form method="get" class="row mb-4">
         <div class="col-md-6">
-            <select name="payment" class="form-select" onchange="this.form.submit()">
+            <select id="payment-select" name="payment" class="form-select" onchange="this.form.submit()">
                 <option value="">Selecione um pagamento</option>
                 {% for payment in payments %}
                     <option value="{{ payment.id }}"
@@ -46,5 +52,6 @@
             <p class="text-center mt-3 text-secondary">Nenhuma alocação encontrada para este pagamento.</p>       
         {% endif %}
     {% endif %}
+
 </div>
 {% endblock %}

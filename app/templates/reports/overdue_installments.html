@@ -3,6 +3,12 @@
 {% block content %}
 <div class="container mt-4">
 
+    <div class="mb-3">
+        <a href="{% url 'reports_menu' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
     <h3 class="text-center mb-4">Parcelas em Atraso</h3>
     <p class="text-center text-muted">Data de referência: {{ today }}</p>
 
