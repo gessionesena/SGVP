@@ -16,8 +16,9 @@
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
             <tr class="text-center">
+                <th>ID.Parc</th>
                 <th>Cliente</th>
-                <th>Cartão</th>
+                <th>Venda</th>
                 <th>Data Vencimento</th>
                 <th>Valor da Parcela</th>
                 <th>Saldo Devedor</th>
@@ -27,8 +28,9 @@
         <tbody>
             {% for item in installments %}
             <tr>
+                <td>{{ item.id }}</td>
                 <td>{{ item.sale.customer }}</td>
-                <td>{{ item.sale.card }}</td>
+                <td>{{ item.sale.title }}</td>
                 <td class="text-center">{{ item.due_date|date:"d/m/Y" }}</td>
                 <td class="text-end">{{ item.amount_total|floatformat:2 }}</td>
                 <td class="text-end"><strong>{{ item.remaining_balance|floatformat:2 }}</strong></td>

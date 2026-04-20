@@ -8,6 +8,23 @@ SGVP - Vendas
 
 <div class="row mb-3">
 
+    <div class="col-md-3">
+        <form method="get" action="{% url 'sale_list' %}">
+            <div class="input-group">
+                <input 
+                    type="number" 
+                    class="form-control" 
+                    name="id" 
+                    placeholder="Buscar por ID" 
+                    value="{{ search_id }}"
+                >
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
     <div class="col-md-6">
         <form method="get" action="{% url 'sale_list' %}">
             <div class="input-group">
@@ -28,8 +45,9 @@ SGVP - Vendas
             </div>
         </form>
     </div>
+
     {% if perms.sales.add_sale %}
-        <div class="col-md-6">
+        <div class="col-md-3">
             <a href="{% url 'sale_create' %}" class="btn btn-success float-end">
                 <i class="bi bi-plus"></i> Nova Venda
             </a>
@@ -44,7 +62,7 @@ SGVP - Vendas
         <input type="hidden" name="q" value="{{ search_q }}">
 
         <div class="input-group mb-3">
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label for="start_date" class="form-label">Data inicial</label>
                 <input 
                     type="date" 
@@ -55,7 +73,7 @@ SGVP - Vendas
                 >
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label for="end_date" class="form-label">Data final</label>
                 <input 
                     type="date" 
@@ -66,7 +84,7 @@ SGVP - Vendas
                 >
             </div>
 
-            <div class="col-md-3 d-flex align-items-end">
+            <div class="col-md-2 d-flex align-items-end">
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-funnel"></i>
                 </button>

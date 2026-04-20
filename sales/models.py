@@ -55,7 +55,7 @@ class Sale(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-sale_date']
+        ordering = ['-id']
 
     def __str__(self):
         customer_name = self.customer.name

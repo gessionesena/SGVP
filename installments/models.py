@@ -36,7 +36,7 @@ class Installment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['due_date']
+        ordering = ['id']
 
     def save(self, *args, **kwargs):
         self.amount_total = sum([

@@ -21,8 +21,15 @@ class SaleListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
             'customer', 'card'
         )
         search_term = self.request.GET.get('q', '').strip()
+        search_id = self.request.GET.get('id', '').strip()
         start_date = self.request.GET.get('start_date')
         end_date = self.request.GET.get('end_date')
+
+        if search_id:
+            if search_id.isdigit():
+                queryset = queryset.filter(id=int(search_id))
+            else:
+                queryset = queryset.none()
 
         if search_term:
             queryset = queryset.filter(
@@ -44,6 +51,7 @@ class SaleListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['search_q'] = self.request.GET.get('q', '')
+        context['search_id'] = self.request.GET.get('id', '')
         context['filter_start_date'] = self.request.GET.get('start_date', '')
         context['filter_end_date'] = self.request.GET.get('end_date', '')
         return context
