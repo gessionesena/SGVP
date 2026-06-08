@@ -122,7 +122,6 @@ SGVP - Parcelas
                         {% endif %}
                     </td>
 
-                    {% if sale %}
                         <td class="text-center">
                             {% if perms.installments.view_installment %}
                                 <a href="{% url 'installment_detail' installment.id %}" class="btn btn-info btn-sm" title="Detalhes da Parcela">
@@ -148,7 +147,7 @@ SGVP - Parcelas
                                 </a>
                             {% endif %}
                         </td>
-                    {% endif %}
+                    
                 </tr>
             {% endfor %}
         </tbody>
