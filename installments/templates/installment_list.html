@@ -103,7 +103,7 @@ SGVP - Parcelas
                 <tr>
                     <td class="text-center">{{ installment.id }}</td>
                     {% if not sale %}
-                        <td>{{ installment.sale }}</td>
+                        <td>{{ installment.sale.id }} - {{ installment.sale.title }} | {{ installment.sale.customer }}</td>
                     {% endif %}
                     <td class="text-center">{{ installment.number }}/{{ installment.sale.installment_quantity }}</td>
                     <td class="text-center">{{ installment.due_date|date:"d/m/Y" }}</td>
@@ -114,9 +114,9 @@ SGVP - Parcelas
                     <td class="text-end">{{ installment.remaining_balance_installment }}</td>
                     <td class="text-center">
                         {% if installment.is_paid_off_installment %}
-                            <span class="badge bg-success">Quitada</span>
+                            <span class="badge bg-success">Paga</span>
                         {% else %}
-                            <span class="badge bg-warning">Pendente</span>
+                            <span class="badge bg-danger">Pendente</span>
                         {% endif %}
                     </td>
 

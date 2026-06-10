@@ -122,9 +122,9 @@ SGVP - Vendas
                 <td class="text-center">{{ sale.installment_quantity }}</td>
                 <td class="text-center">
                     {% if sale.is_paid_off %}
-                        <span class="badge bg-success">Quitada</span>
+                        <span class="badge bg-success">Paga</span>
                     {% else %}
-                        <span class="badge bg-warning">Pendente</span>
+                        <span class="badge bg-danger">Pendente</span>
                     {% endif %}
                 </td>
                 <td class="text-center">
