@@ -71,3 +71,7 @@ class Installment(models.Model):
     @property
     def is_paid_off_installment(self):
         return self.remaining_balance_installment <= Decimal('0.01')
+
+    @property
+    def partially_paid_installment(self):
+        return self.remaining_balance_installment < self.amount_total

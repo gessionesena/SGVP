@@ -6,9 +6,9 @@
                 <div class="card bg-primary text-center">
                     <div class="card-body">
                         <h6 class="card-title"> Quantidade Total de Vendas</h6>
-                        <p class="card-text text-white font-weight-bold display-6">
+                        <span class="card-text text-white font-weight-bold display-6">
                             {{ sales_metrics.total_sales }}
-                        </p>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -18,9 +18,9 @@
                 <div class="card bg-primary bg-opacity-75 text-center">
                     <div class="card-body">
                         <h6 class="card-title"> Custo Total de Vendas</h6>
-                        <p class="card-text text-white font-weight-bold display-6">
-                            R$ {{ sales_metrics.total_sales_cost }}
-                        </p>
+                        R$ <span class="card-text text-white font-weight-bold display-6">
+                            {{ sales_metrics.total_sales_cost }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -30,9 +30,9 @@
                 <div class="card bg-primary bg-opacity-50 text-center">
                     <div class="card-body">
                         <h6 class="card-title"> Valor Total de Vendas</h6>
-                        <p class="card-text text-white font-weight-bold display-6">
-                            R$ {{ sales_metrics.total_sales_value }}
-                        </p>
+                        R$ <span class="card-text text-white font-weight-bold display-6">
+                            {{ sales_metrics.total_sales_value }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -42,9 +42,9 @@
                 <div class="card bg-primary bg-opacity-25 text-center">
                     <div class="card-body">
                         <h6 class="card-title">Lucro Total de Vendas</h6>
-                        <p class="card-text text-white font-weight-bold display-6">
-                            R$ {{ sales_metrics.total_sales_profit }}
-                        </p>
+                        R$ <span class="card-text text-white font-weight-bold display-6">
+                            {{ sales_metrics.total_sales_profit }}
+                        </span>
                     </div>
                 </div>
             </div>

@@ -85,3 +85,8 @@ class Sale(models.Model):
     @property
     def is_paid_off(self):
         return self.remaining_balance <= Decimal('0.009')
+
+    @property
+    def is_partially_paid(self):
+        return self.remaining_balance < self.total_installments_amount
+    

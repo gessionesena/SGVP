@@ -8,9 +8,9 @@
                 <div class="card bg-danger bg-opacity-75 text-center">
                     <div class="card-body">
                         <h6 class="card-title"> Comissões de {{ current_month_name|title }}</h6>
-                        <p class="card-text text-white font-weight-bold display-6">
-                            R$ {{ commissions_metrics.total_commission_current_month }}
-                        </p>
+                        R$ <span class="card-text text-white font-weight-bold display-6">
+                           {{ commissions_metrics.total_commission_current_month }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -19,9 +19,9 @@
                 <div class="card bg-danger bg-opacity-50 text-center">
                     <div class="card-body">
                         <h6 class="card-title"> Comissões de {{ next_month_name|title }}</h6>
-                        <p class="card-text text-white font-weight-bold display-6">
-                            R$ {{ commissions_metrics.total_commission_next_month }}
-                        </p>
+                        R$ <span class="card-text text-white font-weight-bold display-6">
+                            {{ commissions_metrics.total_commission_next_month }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -30,9 +30,9 @@
                 <div class="card bg-danger bg-opacity-25 text-center">
                     <div class="card-body">
                         <h6 class="card-title">Total Geral de Comissões</h6>
-                        <p class="card-text text-white font-weight-bold display-6">
-                            R$ {{ commissions_metrics.total_commission }}
-                        </p>
+                        R$ <span class="card-text text-white font-weight-bold display-6">
+                            {{ commissions_metrics.total_commission }}
+                        </span>
                     </div>
                 </div>
             </div>

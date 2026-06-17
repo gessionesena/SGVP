@@ -9,7 +9,9 @@
                 <ul class="nav flex-column align-items-start" id="menu">
                     {% if perms.sales.view_sale %}
                         <li>
-                            <a href="{% url 'home' %}" class="nav-link px-0 align-middle">
+                            <a href="{% url 'home' %}" 
+                            class="nav-link px-0 align-middle {% if request.resolver_match.url_name == 'home' %}active{% endif %}" 
+                            {% if request.resolver_match.url_name == 'home' %}aria-current="page"{% endif %}>
                             <i class="bi bi-speedometer2 fs-4"></i>
                             <span class="ms-1">Dashboard</span>
                             </a>
@@ -18,7 +20,9 @@
 
                     {% if perms.cards.view_card %}    
                         <li>
-                            <a href="{% url 'card_list' %}" class="nav-link px-0 align-middle">
+                            <a href="{% url 'card_list' %}" 
+                            class="nav-link px-0 align-middle {% if request.resolver_match.url_name == 'card_list' %}active{% endif %}"
+                            {% if request.resolver_match.url_name == 'card_list' %}aria-current="page"{% endif %}>
                             <i class="bi bi-credit-card fs-4"></i>
                             <span class="ms-1">Cartões</span>
                             </a>
@@ -27,7 +31,9 @@
                     
                     {% if perms.categories.view_category %}
                         <li>
-                            <a href="{% url 'category_list' %}" class="nav-link px-0 align-middle">
+                            <a href="{% url 'category_list' %}" 
+                            class="nav-link px-0 align-middle {% if request.resolver_match.url_name == 'category_list' %}active{% endif %}"
+                            {% if request.resolver_match.url_name == 'category_list' %}aria-current="page"{% endif %}>
                             <i class="bi bi-tags fs-4"></i>
                             <span class="ms-1">Categorias</span>
                             </a>
@@ -36,7 +42,9 @@
                     
                     {% if perms.customers.view_customer %}
                         <li>
-                            <a href="{% url 'customer_list' %}" class="nav-link px-0 align-middle">
+                            <a href="{% url 'customer_list' %}" 
+                            class="nav-link px-0 align-middle {% if request.resolver_match.url_name == 'customer_list' %}active{% endif %}"
+                            {% if request.resolver_match.url_name == 'customer_list' %}aria-current="page"{% endif %}>
                             <i class="bi bi-person fs-4"></i>
                             <span class="ms-1">Clientes</span>
                             </a>
@@ -45,7 +53,9 @@
 
                     {% if perms.sales.view_sale %}    
                         <li>
-                            <a href="{% url 'sale_list' %}" class="nav-link px-0 align-middle">
+                            <a href="{% url 'sale_list' %}"
+                            class="nav-link px-0 align-middle {% if request.resolver_match.url_name == 'sale_list' %}active{% endif %}"
+                            {% if request.resolver_match.url_name == 'sale_list' %}aria-current="page"{% endif %}>
                             <i class="bi bi-cart3 fs-4"></i>
                             <span class="ms-1">Vendas</span>
                             </a>
@@ -54,7 +64,9 @@
                     
                     {% if perms.installments.view_installment %}
                         <li>
-                            <a href="{% url 'installment_list' %}" class="nav-link px-0 align-middle">
+                            <a href="{% url 'installment_list' %}"
+                            class="nav-link px-0 align-middle {% if request.resolver_match.url_name == 'installment_list' %}active{% endif %}"
+                            {% if request.resolver_match.url_name == 'installment_list' %}aria-current="page"{% endif %}>
                             <i class="bi bi-calendar4-event fs-4"></i>
                             <span class="ms-1">Parcelas</span>
                             </a>
@@ -63,7 +75,9 @@
                 
                     {% if perms.payments.view_payment %}    
                         <li>
-                        <a href="{% url 'payment_list' %}" class="nav-link px-0 align-middle">
+                        <a href="{% url 'payment_list' %}"
+                        class="nav-link px-0 align-middle {% if request.resolver_match.url_name == 'payment_list' %}active{% endif %}"
+                            {% if request.resolver_match.url_name == 'payment_list' %}aria-current="page"{% endif %}>
                             <i class="bi bi-cash fs-4"></i>
                             <span class="ms-1">Pagamentos</span>
                         </a>
@@ -72,7 +86,9 @@
 
                     {% if perms.payments_allocations.view_payment_allocation %}    
                         <li>
-                        <a href="{% url 'payment_allocation_list' %}" class="nav-link px-0 align-middle">
+                        <a href="{% url 'payment_allocation_list' %}"
+                        class="nav-link px-0 align-middle {% if request.resolver_match.url_name == 'payment_allocation_list' %}active{% endif %}"
+                            {% if request.resolver_match.url_name == 'payment_allocation_list' %}aria-current="page"{% endif %}>
                             <i class="bi bi-cash-coin fs-4"></i>
                             <span class="ms-1">Alocações</span>
                         </a>
@@ -81,7 +97,9 @@
                     
                     {% if perms.sales.view_sale %}
                         <li>
-                        <a href="{% url 'reports_menu' %}" class="nav-link px-0 align-middle">
+                        <a href="{% url 'reports_menu' %}"
+                        class="nav-link px-0 align-middle {% if request.resolver_match.url_name == 'reports_menu' %}active{% endif %}"
+                            {% if request.resolver_match.url_name == 'reports_menu' %}aria-current="page"{% endif %}>
                             <i class="bi bi-clipboard-data fs-4"></i>
                             <span class="ms-1">Relatórios</span>
                         </a>
