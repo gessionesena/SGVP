@@ -160,7 +160,7 @@ SGVP - Parcelas
                             {% endif %}    
 
                             {% if perms.payments_allocations.view_payment_allocation %}    
-                                <a href="{% url 'payments_allocations_by_installment' installment.id %}" class="btn btn-success btn-sm mb-1" title="Visualizar Alocações">
+                                <a href="{% url 'payments_allocations_by_installment' installment.id %}" class="btn btn-success btn-sm mb-1" title="Visualizar Alocações" target="_blank">
                                     <i class="bi bi-cash-coin"></i>
                                 </a>
                             {% endif %}
