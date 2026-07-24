@@ -5,3 +5,15 @@
 .nav-link.active i {
     color: #ffffff;
 }
+
+
+.div-filha {
+  background-color: #1e1e1e;
+  border: 1px solid #333333; /* Borda sutil para dar separação */
+  border-radius: 8px;
+  padding: 20px;
+  color: white;
+  
+  /* Sombra levemente clara (rgba com opacidade baixa) */
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.08); 
+}

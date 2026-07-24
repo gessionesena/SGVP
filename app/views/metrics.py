@@ -6,11 +6,13 @@ from django.utils import timezone
 from django.utils.formats import date_format
 from django.utils.formats import number_format
 from django.db.models import Sum, F
+from django.db.models.functions import TruncMonth
 from sales.models import Sale
 from installments.models import Installment
 from categories.models import Category
 from cards.models import Card
 from customers.models import Customer
+from payments_allocations.models import Payment_Allocation
 
 
 def get_sales_metrics():
@@ -180,3 +182,143 @@ def get_next_due_installments_by_card():
         subtotal = subtotal.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         result[card.title] = float(subtotal)
     return result
+
+
+def get_monthly_commissions_last_12_months():
+    today = timezone.now().date().replace(day=1)
+    start_date = today - relativedelta(months=11)
+    end_date = today + relativedelta(months=1)
+
+    commissions = (
+        Installment.objects
+        .filter(
+            commission_value__gt=Decimal('0.00'),
+            due_date__gte=start_date,
+            due_date__lt=end_date,
+        )
+        .annotate(month=TruncMonth("due_date"))
+        .values("month")
+        .annotate(total=Sum("commission_value"))
+        .order_by("month")
+    )
+
+    commissions_dict = {
+        item["month"]: item["total"]
+        for item in commissions
+    }
+
+    dates = []
+    values = []
+
+    for i in range(11, -1, -1):
+        month = today - relativedelta(months=i)
+
+        dates.append(
+            date_format(month, "b/Y").title()
+        )
+
+        total = commissions_dict.get(month, Decimal("0.00"))
+        total = total.quantize(
+            Decimal('0.01'),
+            rounding=ROUND_HALF_UP,
+        )
+
+        values.append(float(total))
+
+    return {
+        "dates": dates,
+        "values": values,
+    }
+
+
+def get_monthly_installments_last_12_months():
+    today = timezone.now().date().replace(day=1)
+    start_date = today - relativedelta(months=11)
+    end_date = today + relativedelta(months=1)
+
+    installments = (
+        Installment.objects
+        .filter(
+            due_date__gte=start_date,
+            due_date__lt=end_date,
+        )
+        .annotate(month=TruncMonth("due_date"))
+        .values("month")
+        .annotate(total=Sum("amount_total"))
+        .order_by("month")
+    )
+
+    installments_dict = {
+        item["month"]: item["total"]
+        for item in installments
+    }
+
+    dates = []
+    values = []
+
+    for i in range(11, -1, -1):
+        month = today - relativedelta(months=i)
+
+        dates.append(
+            date_format(month, "b/Y").title()
+        )
+
+        total = installments_dict.get(month, Decimal("0.00"))
+        total = total.quantize(
+            Decimal('0.01'),
+            rounding=ROUND_HALF_UP,
+        )
+
+        values.append(float(total))
+
+    return {
+        "dates": dates,
+        "values": values,
+    }
+
+
+def get_monthly_payment_allocations_last_12_months():
+    today = timezone.now().date().replace(day=1)
+    start_date = today - relativedelta(months=11)
+    end_date = today + relativedelta(months=1)
+
+
+    allocations = (
+        Payment_Allocation.objects
+        .filter(
+            installment__due_date__gte=start_date,
+            installment__due_date__lt=end_date,
+        )
+        .annotate(month=TruncMonth("installment__due_date"))
+        .values("month")
+        .annotate(total=Sum("amount_applied"))
+        .order_by("month")
+    )
+
+    allocations_dict = {
+            item["month"]: item["total"]
+            for item in allocations
+    }
+
+    dates = []
+    values = []
+
+    for i in range(11, -1, -1):
+        month = today - relativedelta(months=i)
+
+        dates.append(
+            date_format(month, "b/Y").title()
+        )
+
+        total = allocations_dict.get(month, Decimal("0.00"))
+        total = total.quantize(
+            Decimal('0.01'),
+            rounding=ROUND_HALF_UP,
+        )
+
+        values.append(float(total))
+
+    return {
+        "dates": dates,
+        "values": values,
+    }

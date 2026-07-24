@@ -49,6 +49,7 @@
         <table class="table table-bordered table-striped">
             <thead class="table-dark">
                 <tr class="text-center">
+                    <th>IDParc</th>
                     <th>Cliente</th>
                     <th>Parcela</th>
                     <th>Venda</th>
@@ -63,8 +64,9 @@
             <tbody>
                 {% for installment in installments %}
                 <tr>
+                    <td class="text-center">{{ installment.id }}</td>
                     <td>{{ installment.sale.customer.name }}</td>
-                    <td>{{ installment.number }}/{{ installment.sale.installment_quantity }}</td>
+                    <td class="text-center">{{ installment.number }}/{{ installment.sale.installment_quantity }}</td>
                     <td>{{ installment.sale.title }}</td>
                     <td>{{ installment.sale.card }}</td>
                     <td class="text-center">{{ installment.due_date|date:"d/m/Y" }}</td>
