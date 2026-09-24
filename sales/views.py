@@ -24,6 +24,7 @@ class SaleListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         search_id = self.request.GET.get('id', '').strip()
         start_date = self.request.GET.get('start_date')
         end_date = self.request.GET.get('end_date')
+        status = self.request.GET.get('status')
 
         if search_id:
             if search_id.isdigit():
@@ -46,6 +47,25 @@ class SaleListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         if end_date:
             queryset = queryset.filter(sale_date__lte=end_date)
 
+        if status:
+            filtered_sales = []
+
+            for sale in queryset:
+
+                if sale.is_paid_off:
+                    current_status = 'paid'
+
+                elif sale.is_partially_paid:
+                    current_status = 'partial'
+
+                else:
+                    current_status = 'pending'
+
+                if current_status == status:
+                    filtered_sales.append(sale)
+
+            return filtered_sales
+
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -54,6 +74,7 @@ class SaleListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         context['search_id'] = self.request.GET.get('id', '')
         context['filter_start_date'] = self.request.GET.get('start_date', '')
         context['filter_end_date'] = self.request.GET.get('end_date', '')
+        context['filter_status'] = self.request.GET.get('status', '')
         return context
 
 

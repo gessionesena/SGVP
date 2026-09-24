@@ -32,6 +32,7 @@ class InstallmentListView(LoginRequiredMixin, PermissionRequiredMixin, ListView)
         search_id = self.request.GET.get('id', '').strip()
         start_date = self.request.GET.get('start_date')
         end_date = self.request.GET.get('end_date')
+        status = self.request.GET.get('status')
 
         if search_id:
             if search_id.isdigit():
@@ -53,6 +54,25 @@ class InstallmentListView(LoginRequiredMixin, PermissionRequiredMixin, ListView)
         if end_date:
             queryset = queryset.filter(due_date__lte=end_date)
 
+        if status:
+            filtered_installments = []
+
+            for installment in queryset:
+
+                if installment.is_paid_off_installment:
+                    current_status = 'paid'
+
+                elif installment.partially_paid_installment:
+                    current_status = 'partial'
+
+                else:
+                    current_status = 'pending'
+
+                if current_status == status:
+                    filtered_installments.append(installment)
+
+            return filtered_installments
+            
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -62,6 +82,8 @@ class InstallmentListView(LoginRequiredMixin, PermissionRequiredMixin, ListView)
         context['search_id'] = self.request.GET.get('id', '')
         context['filter_start_date'] = self.request.GET.get('start_date', '')
         context['filter_end_date'] = self.request.GET.get('end_date', '')
+        context['filter_status'] = self.request.GET.get('status', '')
+
         return context
 
 

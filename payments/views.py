@@ -33,6 +33,7 @@ class PaymentListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['customer'] = self.request.GET.get('customer', '')
         context['filter_start_date'] = self.request.GET.get('start_date', '')
         context['filter_end_date'] = self.request.GET.get('end_date', '')
         return context

@@ -18,82 +18,106 @@ SGVP - Parcelas
 {% endif %}
 
 {% if not sale %}
-    <div class="row mb-3">
+    <form method="get" action="{% url 'installment_list' %}">
 
-        <div class="col-md-3">
-            <form method="get" action="{% url 'installment_list' %}">
-                <div class="input-group">
-                    <input 
-                        type="number" 
-                        class="form-control" 
-                        name="id" 
-                        placeholder="Buscar por ID" 
-                        value="{{ search_id }}"
-                    >
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
+        <div class="row mb-3">
 
-        <div class="col-md-6">
-            <form method="get" action="{% url 'installment_list' %}">
-                <div class="input-group">
-                    <input type="text" class="form-control" name="q" placeholder="Buscar por Cliente ou Venda" value="{{ search_term }}">
+            <div class="col-md-1">
+                <label for="id" class="form-label mb-0">
+                    ID
+                </label>
 
-                    <input type="hidden" name="start_date" value="{{ filter_start_date }}">
-                    <input type="hidden" name="end_date" value="{{ filter_end_date }}">
-
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
-        
-    </div>
-
-
-    <div class="row mb-3">
-
-        <form method="get">
-
-            <input type="hidden" name="q" value="{{ search_term }}">
-
-            <div class="input-group mb-1">
-                <div class="col-md-2 me-3">
-                    <label for="start_date" class="form-label mb-0">Data inicial</label>
-                    <input 
-                        type="date" 
-                        id="start_date" 
-                        name="start_date" 
-                        value="{{ filter_start_date }}" 
-                        class="form-control"
-                    >
-                </div>
-
-                <div class="col-md-2 me-3">
-                    <label for="end_date" class="form-label mb-0">Data final</label>
-                    <input 
-                        type="date" 
-                        id="end_date" 
-                        name="end_date" 
-                        value="{{ filter_end_date }}"
-                        class="form-control"
-                    >
-                </div>
-
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-funnel"></i>
-                    </button>
-                </div>
-
+                <input
+                    type="number"
+                    name="id"
+                    id="id"
+                    class="form-control mt-0 mb-2"
+                    placeholder="ID"
+                    value="{{ search_id }}"
+                >
             </div>
-        </form>
-    </div>
 
+            <div class="col-md-3">
+                <label for="q" class="form-label mb-0">
+                    Cliente ou Venda
+                </label>
+
+                <input
+                    type="text"
+                    name="q"
+                    id="q"
+                    class="form-control mt-0 mb-2"
+                    placeholder="Buscar por Cliente ou Venda"
+                    value="{{ search_term }}"
+                >
+            </div>
+
+            <div class="col-md-2">
+                <label for="start_date" class="form-label mb-0">
+                    Data inicial
+                </label>
+
+                <input
+                    type="date"
+                    name="start_date"
+                    id="start_date"
+                    class="form-control mt-0 mb-2"
+                    value="{{ filter_start_date }}"
+                >
+            </div>
+
+            <div class="col-md-2">
+                <label for="end_date" class="form-label mb-0">
+                    Data final
+                </label>
+
+                <input
+                    type="date"
+                    name="end_date"
+                    id="end_date"
+                    class="form-control mt-0 mb-2"
+                    value="{{ filter_end_date }}"
+                >
+            </div>
+
+            <div class="col-md-2">
+                <label for="status" class="form-label mb-0">
+                    Status
+                </label>
+
+                <select
+                    name="status"
+                    id="status"
+                    class="form-select mt-0 mb-2"
+                >
+                    <option value="">Todos</option>
+
+                    <option value="paid"
+                        {% if filter_status == 'paid' %}selected{% endif %}>
+                        Liquidada
+                    </option>
+
+                    <option value="partial"
+                        {% if filter_status == 'partial' %}selected{% endif %}>
+                        Em Pagamento
+                    </option>
+
+                    <option value="pending"
+                        {% if filter_status == 'pending' %}selected{% endif %}>
+                        Pendente
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary mt-0 mb-2">
+                    <i class="bi bi-funnel"></i>
+                    Filtrar
+                </button>
+            </div>
+        </div>    
+
+    </form>
 
 {% endif %}
 

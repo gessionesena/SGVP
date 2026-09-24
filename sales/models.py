@@ -88,5 +88,9 @@ class Sale(models.Model):
 
     @property
     def is_partially_paid(self):
-        return self.remaining_balance < self.total_installments_amount
+        return (
+            self.total_paid > Decimal('0.00')
+            and not self.is_paid_off
+        )
+        #return self.remaining_balance < self.total_installments_amount
     
