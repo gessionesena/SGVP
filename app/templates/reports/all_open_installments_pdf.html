@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório Geral de Parcelas em Aberto</title>
+</head>
+
+<body>
+
+<div class="header-right">
+    <strong>Gerado em:</strong>
+    {{ generated_at|date:"d/m/Y H:i" }}
+</div>
+
+<h2>Relatório Geral de Parcelas em Aberto</h2>
+
+<p>
+    <strong>Clientes com saldo pendente:</strong>
+    {{ total_customers }}
+    &nbsp; | &nbsp;
+    <strong>Parcelas em aberto:</strong>
+    {{ total_installments }}
+</p>
+
+{% for group in grouped_customers %}
+
+    <h3>
+        {{ forloop.counter }}. {{ group.customer.name }}
+    </h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Parcela</th>
+                <th>Venda</th>
+                <th>Vencimento</th>
+                <th>Valor</th>
+                <th>Comissão</th>
+                <th>Total</th>
+                <th>Saldo Devedor</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for installment in group.items %}
+            <tr>
+                <td class="text-center">
+                    {{ installment.number }}/{{ installment.sale.installment_quantity }}
+                </td>
+                <td>{{ installment.sale.title }}</td>
+                <td class="text-center">
+                    {{ installment.due_date|date:"d/m/Y" }}
+                </td>
+                <td class="text-end">
+                    {{ installment.amount|floatformat:2 }}
+                </td>
+                <td class="text-end">
+                    {{ installment.commission_value|floatformat:2 }}
+                </td>
+                <td class="text-end">
+                    {{ installment.amount_total|floatformat:2 }}
+                </td>
+                <td class="text-end">
+                    {{ installment.remaining_balance|floatformat:2 }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <th colspan="5" class="text-end">
+                    Subtotal do cliente
+                </th>
+                <th class="text-end">
+                    {{ group.total_amount|floatformat:2 }}
+                </th>
+                <th class="text-end">
+                    {{ group.total_balance|floatformat:2 }}
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+
+{% empty %}
+
+    <p>Não existem parcelas em aberto para listar.</p>
+
+{% endfor %}
+
+<hr>
+
+<h3>Resumo Geral</h3>
+
+<table>
+    <tbody>
+        <tr>
+            <th>Quantidade de clientes</th>
+            <td class="text-end">{{ total_customers }}</td>
+        </tr>
+        <tr>
+            <th>Quantidade de parcelas</th>
+            <td class="text-end">{{ total_installments }}</td>
+        </tr>
+        <tr>
+            <th>Valor total original das parcelas</th>
+            <td class="text-end">
+                {{ total_amount|floatformat:2 }}
+            </td>
+        </tr>
+        <tr>
+            <th>Total geral em aberto</th>
+            <td class="text-end">
+                {{ total_balance|floatformat:2 }}
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

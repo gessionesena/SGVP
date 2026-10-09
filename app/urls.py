@@ -3,7 +3,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import path, include
 from app.views.home import home
 from app.views.reports_menu import reports_menu
-from app.views.reports import overdue_installments, sales_by_customer, sales_by_card, sales_by_category, installments_by_sale, installments_by_customer, installments_by_card, payments_by_customer, allocations_by_payment, allocations_by_installment, installments_by_due_date, commissions_by_month
+from app.views.reports import overdue_installments, sales_by_customer, sales_by_card, sales_by_category, installments_by_sale, installments_by_customer, installments_by_card, payments_by_customer, allocations_by_payment, allocations_by_installment, installments_by_due_date, commissions_by_month, all_open_installments
 
 
 urlpatterns = [
@@ -21,6 +21,8 @@ urlpatterns = [
     path("reports/installments_by_customer/", installments_by_customer.installments_by_customer_report, name="installments_by_customer_report"),
     path("reports/installments_by_card/", installments_by_card.installments_by_card_report, name="installments_by_card_report"),
     path("reports/installments_by_due_date/", installments_by_due_date.installments_by_due_date_report, name="installments_by_due_date_report"),
+    path("reports/all_open_installments/", all_open_installments.all_open_installments_report,
+    name="all_open_installments_report"),
 
     path("reports/payments_by_customer/", payments_by_customer.payments_by_customer_report, name="payments_by_customer_report"),
     path("reports/allocations_by_payment/", allocations_by_payment.allocations_by_payment_report, name="allocations_by_payment_report"),
