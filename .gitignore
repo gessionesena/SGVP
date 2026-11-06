@@ -3,4 +3,4 @@ db.sqlite3
 __pycache__
 .env
 home_.html
-matrics_.py
+metrics_.py
