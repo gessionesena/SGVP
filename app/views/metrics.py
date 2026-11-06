@@ -1,12 +1,14 @@
+
 from calendar import monthrange
-from dateutil.relativedelta import relativedelta
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal, ROUND_HALF_UP
-from django.utils import timezone
-from django.utils.formats import date_format
-from django.utils.formats import number_format
-from django.db.models import Sum, F
+
+from dateutil.relativedelta import relativedelta
+from django.db.models import Count, F, Sum
 from django.db.models.functions import TruncMonth
+from django.utils import timezone
+from django.utils.formats import date_format, number_format
+
 from sales.models import Sale
 from installments.models import Installment
 from categories.models import Category
@@ -15,154 +17,337 @@ from customers.models import Customer
 from payments_allocations.models import Payment_Allocation
 
 
-def get_sales_metrics():
-    total_sales = Sale.objects.count()
-    total_sales_cost = Sale.objects.aggregate(
-        total=Sum('cost_price')
-    )['total'] or Decimal('0.00')
+ZERO = Decimal("0.00")
 
-    total_sales_value = Sale.objects.aggregate(
-        total=Sum('selling_price')
-    )['total'] or Decimal('0.00')
-    total_sales_profit = total_sales_value - total_sales_cost
 
-    return dict(
-        total_sales=total_sales,
-        total_sales_cost=number_format(total_sales_cost, decimal_pos=2, force_grouping=True),
-        total_sales_value=number_format(total_sales_value, decimal_pos=2, force_grouping=True),
-        total_sales_profit=number_format(total_sales_profit, decimal_pos=2, force_grouping=True),
+# ==========================================================
+# FUNÇÕES AUXILIARES
+# ==========================================================
+
+def _get_sum(queryset, field):
+    """Retorna a soma de um campo ou zero quando não houver valores."""
+    return queryset.aggregate(total=Sum(field))["total"] or ZERO
+
+
+def _format_currency(value):
+    """Formata valores monetários para exibição."""
+    return number_format(
+        value,
+        decimal_pos=2,
+        force_grouping=True,
     )
 
+
+def _to_float(value, quantize=False):
+    """Converte Decimal para float, com arredondamento opcional."""
+    if quantize:
+        value = value.quantize(
+            Decimal("0.01"),
+            rounding=ROUND_HALF_UP,
+        )
+
+    return float(value)
+
+
+def _get_monthly_chart_data(
+    queryset,
+    date_field,
+    value_field,
+    months_before=11,
+    months_after=1,
+    filters=None,
+):
+    """
+    Gera datas e valores mensais para os gráficos.
+
+    Por padrão, retorna 11 meses anteriores,
+    o mês atual e o mês seguinte.
+    """
+    today = timezone.now().date().replace(day=1)
+
+    start_date = today - relativedelta(months=months_before)
+    end_date = today + relativedelta(months=months_after + 1)
+
+    query_filters = {
+        f"{date_field}__gte": start_date,
+        f"{date_field}__lt": end_date,
+    }
+
+    if filters:
+        query_filters.update(filters)
+
+    monthly_data = (
+        queryset
+        .filter(**query_filters)
+        .annotate(month=TruncMonth(date_field))
+        .values("month")
+        .annotate(total=Sum(value_field))
+        .order_by("month")
+    )
+
+    monthly_dict = {
+        item["month"]: item["total"]
+        for item in monthly_data
+    }
+
+    dates = []
+    values = []
+
+    for i in range(months_before, -months_after - 1, -1):
+        month = today - relativedelta(months=i)
+
+        dates.append(date_format(month, "b/Y").title())
+
+        total = monthly_dict.get(month, ZERO)
+        values.append(_to_float(total, quantize=True))
+
+    return {
+        "dates": dates,
+        "values": values,
+    }
+
+
+# ==========================================================
+# MÉTRICAS DE VENDAS
+# ==========================================================
+
+def get_sales_metrics():
+    sales = Sale.objects.aggregate(
+        total_sales=Count("id"),
+        total_sales_cost=Sum("cost_price"),
+        total_sales_value=Sum("selling_price"),
+    )
+
+    total_sales = sales["total_sales"]
+    total_sales_cost = sales["total_sales_cost"] or ZERO
+    total_sales_value = sales["total_sales_value"] or ZERO
+
+    total_sales_profit = total_sales_value - total_sales_cost
+
+    return {
+        "total_sales": total_sales,
+        "total_sales_cost": _format_currency(total_sales_cost),
+        "total_sales_value": _format_currency(total_sales_value),
+        "total_sales_profit": _format_currency(total_sales_profit),
+    }
+
+
+# ==========================================================
+# MÉTRICAS DE COMISSÕES
+# ==========================================================
 
 def get_commissions_metrics():
     today = date.today()
     next_month = today + relativedelta(months=1)
 
-    total_commission_current_month = Installment.objects.filter(
-        due_date__month=today.month,
-        due_date__year=today.year
-    ).aggregate(
-        total=Sum('commission_value')
-    )['total'] or Decimal('0.00')
+    current_month_filter = {
+        "due_date__month": today.month,
+        "due_date__year": today.year,
+    }
 
-    total_commission_next_month = Installment.objects.filter(
-        due_date__month=next_month.month,
-        due_date__year=next_month.year,
-    ).aggregate(
-        total=Sum('commission_value')
-    )['total'] or Decimal('0.00')
+    next_month_filter = {
+        "due_date__month": next_month.month,
+        "due_date__year": next_month.year,
+    }
 
-    total_commission = Installment.objects.aggregate(
-        total=Sum('commission_value')
-    )['total'] or Decimal('0.00')
-
-    return dict(
-        total_commission_current_month=number_format(total_commission_current_month, decimal_pos=2, force_grouping=True),
-        total_commission_next_month=number_format(total_commission_next_month, decimal_pos=2, force_grouping=True),
-        total_commission=number_format(total_commission, decimal_pos=2, force_grouping=True),
+    total_commission_current_month = _get_sum(
+        Installment.objects.filter(**current_month_filter),
+        "commission_value",
     )
 
+    total_commission_next_month = _get_sum(
+        Installment.objects.filter(**next_month_filter),
+        "commission_value",
+    )
+
+    total_commission = _get_sum(
+        Installment.objects.all(),
+        "commission_value",
+    )
+
+    return {
+        "total_commission_current_month": _format_currency(
+            total_commission_current_month
+        ),
+        "total_commission_next_month": _format_currency(
+            total_commission_next_month
+        ),
+        "total_commission": _format_currency(total_commission),
+    }
+
+
+# ==========================================================
+# VENDAS DIÁRIAS
+# ==========================================================
 
 def get_daily_sales_data():
     today = timezone.now().date()
-    values = []
-    dates = [(today - timezone.timedelta(days=i)) for i in range(29, -1, -1)]
 
-    for item in dates:
-        sales_total = Sale.objects.filter(
-            sale_date=item,
-        ).aggregate(
-            total_sales=Sum('selling_price')
-        )['total_sales'] or Decimal('0.00')
+    dates = [
+        today - timedelta(days=i)
+        for i in range(29, -1, -1)
+    ]
 
-        values.append(float(sales_total))
+    daily_sales = (
+        Sale.objects
+        .filter(sale_date__gte=dates[0], sale_date__lte=today)
+        .values("sale_date")
+        .annotate(total_sales=Sum("selling_price"))
+        .order_by("sale_date")
+    )
 
-    formatted_dates = [d.strftime("%d/%m/%Y") for d in dates]
+    sales_dict = {
+        item["sale_date"]: item["total_sales"]
+        for item in daily_sales
+    }
 
-    return dict(
-        dates=formatted_dates,
-        values=values,
+    formatted_dates = [
+        item.strftime("%d/%m/%Y")
+        for item in dates
+    ]
+
+    values = [
+        float(sales_dict.get(item, ZERO))
+        for item in dates
+    ]
+
+    return {
+        "dates": formatted_dates,
+        "values": values,
+    }
+
+
+# ==========================================================
+# VENDAS MENSAIS
+# ==========================================================
+
+def get_monthly_sales_last_12_months():
+    return _get_monthly_chart_data(
+        queryset=Sale.objects.all(),
+        date_field="sale_date",
+        value_field="selling_price",
+        months_before=11,
+        months_after=0,
     )
 
 
-def get_monthly_sales_last_12_months():
-    today = timezone.now().date().replace(day=1)
-
-    dates = []
-    values = []
-
-    for i in range(11, -1, -1):
-        month = today - relativedelta(months=i)
-        month_start = month
-        month_end = month + relativedelta(months=1)
-
-        dates.append(date_format(month, "b/Y").title())
-
-        total = (
-            Sale.objects.filter(
-                sale_date__gte=month_start,
-                sale_date__lt=month_end
-            ).aggregate(
-                total_sales=Sum("selling_price")
-            )["total_sales"] or Decimal('0.00')
-        )
-        total = total.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-        values.append(float(total))
-
-    return {"dates": dates, "values": values}
-
+# ==========================================================
+# GRÁFICOS DE VENDAS POR CATEGORIA
+# ==========================================================
 
 def get_graphic_sale_category_metric():
     categories = Category.objects.all()
-    return {category.title: Sale.objects.filter(category=category).count() for category in categories}
 
+    sales_by_category = (
+        Sale.objects
+        .values("category_id")
+        .annotate(total=Count("id"))
+    )
+
+    sales_dict = {
+        item["category_id"]: item["total"]
+        for item in sales_by_category
+    }
+
+    return {
+        category.title: sales_dict.get(category.pk, 0)
+        for category in categories
+    }
+
+
+# ==========================================================
+# GRÁFICOS DE VENDAS POR CARTÃO
+# ==========================================================
 
 def get_graphic_sale_card_metric():
     today = date.today()
-    cards = Card.objects.all()
 
-    return {card.title: float(Sale.objects.filter(
-        card=card,
-        sale_date__month=today.month,
-        sale_date__year=today.year
-    ).aggregate(
-        total=Sum('cost_price')
-    )['total'] or Decimal('0.00')) for card in cards}
+    sales_by_card = (
+        Sale.objects
+        .filter(
+            sale_date__month=today.month,
+            sale_date__year=today.year,
+        )
+        .values("card_id")
+        .annotate(total=Sum("cost_price"))
+    )
 
+    sales_dict = {
+        item["card_id"]: item["total"]
+        for item in sales_by_card
+    }
+
+    return {
+        card.title: _to_float(sales_dict.get(card.pk) or ZERO)
+        for card in Card.objects.all()
+    }
+
+
+# ==========================================================
+# GRÁFICOS DE VENDAS POR CLIENTE
+# ==========================================================
 
 def get_graphic_sale_customer_metric():
     today = date.today()
-    customers = Customer.objects.all()
 
-    return {customer.name: float(Sale.objects.filter(
-        customer=customer,
-        sale_date__month=today.month,
-        sale_date__year=today.year
-    ).aggregate(
-        total=Sum('selling_price')
-    )['total'] or Decimal('0.00')) for customer in customers}
+    sales_by_customer = (
+        Sale.objects
+        .filter(
+            sale_date__month=today.month,
+            sale_date__year=today.year,
+        )
+        .values("customer_id")
+        .annotate(total=Sum("selling_price"))
+    )
 
+    sales_dict = {
+        item["customer_id"]: item["total"]
+        for item in sales_by_customer
+    }
+
+    return {
+        customer.name: _to_float(sales_dict.get(customer.pk) or ZERO)
+        for customer in Customer.objects.all()
+    }
+
+
+# ==========================================================
+# PRÓXIMAS PARCELAS POR CARTÃO
+# ==========================================================
 
 def get_next_due_installments_by_card():
     today = date.today()
     cards = list(Card.objects.all())
-    result = {}
 
     all_installments = (
-        Installment.objects.annotate(
-            installment_value=F('sale__cost_price') / F('sale__installment_quantity')
-        ).select_related('sale__card')
+        Installment.objects
+        .annotate(
+            installment_value=(
+                F("sale__cost_price") / F("sale__installment_quantity")
+            )
+        )
     )
+
+    installments_by_card = (
+        all_installments
+        .values("sale__card_id", "due_date")
+        .annotate(total=Sum("installment_value"))
+    )
+
+    installments_dict = {
+        (item["sale__card_id"], item["due_date"]): item["total"]
+        for item in installments_by_card
+    }
+
+    result = {}
 
     for card in cards:
         due_day = card.payment_due_day
         limit_day = max(1, due_day - 5)
 
         if today.day >= limit_day:
-            if today.month == 12:
-                year, month = today.year + 1, 1
-            else:
-                year, month = today.year, today.month + 1
+            next_month = today + relativedelta(months=1)
+            year, month = next_month.year, next_month.month
         else:
             year, month = today.year, today.month
 
@@ -171,154 +356,59 @@ def get_next_due_installments_by_card():
 
         next_due_date = date(year, month, final_due_day)
 
-        subtotal = (
-            all_installments.filter(
-                sale__card=card,
-                due_date=next_due_date
-            ).aggregate(
-                total=Sum('installment_value')
-            )['total'] or Decimal('0.00')
+        subtotal = installments_dict.get(
+            (card.pk, next_due_date),
+            ZERO,
         )
-        subtotal = subtotal.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-        result[card.title] = float(subtotal)
+
+        result[card.title] = _to_float(
+            subtotal,
+            quantize=True,
+        )
+
     return result
 
 
-def get_monthly_commissions_last_12_months():
-    today = timezone.now().date().replace(day=1)
-    start_date = today - relativedelta(months=11)
-    end_date = today + relativedelta(months=1)
+# ==========================================================
+# COMISSÕES MENSAIS
+# ==========================================================
 
-    commissions = (
-        Installment.objects
-        .filter(
-            commission_value__gt=Decimal('0.00'),
-            due_date__gte=start_date,
-            due_date__lt=end_date,
-        )
-        .annotate(month=TruncMonth("due_date"))
-        .values("month")
-        .annotate(total=Sum("commission_value"))
-        .order_by("month")
+def get_monthly_commissions_last_12_months():
+    return _get_monthly_chart_data(
+        queryset=Installment.objects.all(),
+        date_field="due_date",
+        value_field="commission_value",
+        months_before=11,
+        months_after=1,
+        filters={
+            "commission_value__gt": ZERO,
+        },
     )
 
-    commissions_dict = {
-        item["month"]: item["total"]
-        for item in commissions
-    }
 
-    dates = []
-    values = []
-
-    for i in range(11, -1, -1):
-        month = today - relativedelta(months=i)
-
-        dates.append(
-            date_format(month, "b/Y").title()
-        )
-
-        total = commissions_dict.get(month, Decimal("0.00"))
-        total = total.quantize(
-            Decimal('0.01'),
-            rounding=ROUND_HALF_UP,
-        )
-
-        values.append(float(total))
-
-    return {
-        "dates": dates,
-        "values": values,
-    }
-
+# ==========================================================
+# PARCELAS MENSAIS
+# ==========================================================
 
 def get_monthly_installments_last_12_months():
-    today = timezone.now().date().replace(day=1)
-    start_date = today - relativedelta(months=11)
-    end_date = today + relativedelta(months=1)
-
-    installments = (
-        Installment.objects
-        .filter(
-            due_date__gte=start_date,
-            due_date__lt=end_date,
-        )
-        .annotate(month=TruncMonth("due_date"))
-        .values("month")
-        .annotate(total=Sum("amount_total"))
-        .order_by("month")
+    return _get_monthly_chart_data(
+        queryset=Installment.objects.all(),
+        date_field="due_date",
+        value_field="amount_total",
+        months_before=11,
+        months_after=1,
     )
 
-    installments_dict = {
-        item["month"]: item["total"]
-        for item in installments
-    }
 
-    dates = []
-    values = []
-
-    for i in range(11, -1, -1):
-        month = today - relativedelta(months=i)
-
-        dates.append(
-            date_format(month, "b/Y").title()
-        )
-
-        total = installments_dict.get(month, Decimal("0.00"))
-        total = total.quantize(
-            Decimal('0.01'),
-            rounding=ROUND_HALF_UP,
-        )
-
-        values.append(float(total))
-
-    return {
-        "dates": dates,
-        "values": values,
-    }
-
+# ==========================================================
+# PAGAMENTOS MENSAIS
+# ==========================================================
 
 def get_monthly_payment_allocations_last_12_months():
-    today = timezone.now().date().replace(day=1)
-    start_date = today - relativedelta(months=11)
-    end_date = today + relativedelta(months=1)
-
-
-    allocations = (
-        Payment_Allocation.objects
-        .filter(
-            installment__due_date__gte=start_date,
-            installment__due_date__lt=end_date,
-        )
-        .annotate(month=TruncMonth("installment__due_date"))
-        .values("month")
-        .annotate(total=Sum("amount_applied"))
-        .order_by("month")
+    return _get_monthly_chart_data(
+        queryset=Payment_Allocation.objects.all(),
+        date_field="installment__due_date",
+        value_field="amount_applied",
+        months_before=11,
+        months_after=1,
     )
-
-    allocations_dict = {
-            item["month"]: item["total"]
-            for item in allocations
-    }
-
-    dates = []
-    values = []
-
-    for i in range(11, -1, -1):
-        month = today - relativedelta(months=i)
-
-        dates.append(
-            date_format(month, "b/Y").title()
-        )
-
-        total = allocations_dict.get(month, Decimal("0.00"))
-        total = total.quantize(
-            Decimal('0.01'),
-            rounding=ROUND_HALF_UP,
-        )
-
-        values.append(float(total))
-
-    return {
-        "dates": dates,
-        "values": values,
-    }

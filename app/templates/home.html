@@ -112,12 +112,12 @@
     <div class="row mt-4 justify-content-center">
 
         <div class="col-md-6 text-center">
-            <h6 class="text-center mt-3 mb-3">Faturamento X Comissão (12 Meses)</h6>
+            <h6 class="text-center mt-3 mb-3">Faturamento X Comissão</h6>
             <canvas id="installmentsVersusCommissionsChart"></canvas>
         </div>
 
         <div class="col-md-6 text-center">
-            <h6 class="text-center mt-3 mb-3">Dívida X Pagamento (12 Meses)</h6>
+            <h6 class="text-center mt-3 mb-3">Dívida X Pagamento</h6>
             <canvas id="installmentsVersusPaymentAllocationsChart"></canvas>
         </div>
 
@@ -134,22 +134,53 @@
                     data: {
                         labels: monthlyInstallmentsDataLast12Months.dates,
                         datasets: [
-                            {
+                             {
                                 type: 'line',
                                 label: 'Total em Comissões(R$)',
                                 data: monthlyCommissionsDataLast12Months.values,
                                 fill: false,
+
                                 borderColor: 'rgba(54, 162, 235, 1)',
                                 borderWidth: 2,
                                 tension: 0.5,
                                 stack: 'combined',
+
+                                // Destaque do mês seguinte
+                                pointBackgroundColor: monthlyCommissionsDataLast12Months.values.map((_, index) =>
+                                    index === monthlyCommissionsDataLast12Months.values.length - 1
+                                        ? 'rgba(54, 162, 235, 0)'
+                                        : 'rgba(54, 162, 235, 1)'
+                                ),
+
+                                pointBorderColor: monthlyCommissionsDataLast12Months.values.map((_, index) =>
+                                    index === monthlyCommissionsDataLast12Months.values.length - 1
+                                        ? 'rgba(54, 162, 235, 1)'
+                                        : 'rgba(54, 162, 235, 1)'
+                                ),
+
+                                pointRadius: monthlyCommissionsDataLast12Months.values.map((_, index) =>
+                                    index === monthlyCommissionsDataLast12Months.values.length - 1 ? 3 : 3
+                                ),
+
+                                pointHoverRadius: 4,
                             },
                             {
                                 type: 'bar',
                                 label: 'Total em Parcelas(R$)',
                                 data: monthlyInstallmentsDataLast12Months.values,
-                                backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                                borderColor: 'rgba(255, 99, 132, 1)',
+
+                                backgroundColor: monthlyInstallmentsDataLast12Months.values.map((_, index) =>
+                                    index === monthlyInstallmentsDataLast12Months.values.length - 1
+                                        ? 'rgba(255, 99, 132, 0.1)'
+                                        : 'rgba(255, 99, 132, 0.6)'
+                                ),
+
+                                borderColor: monthlyInstallmentsDataLast12Months.values.map((_, index) =>
+                                    index === monthlyInstallmentsDataLast12Months.values.length - 1
+                                        ? 'rgba(255, 99, 132, 1)'
+                                        : 'rgba(255, 99, 132, 1)'
+                                ),
+
                                 borderWidth: 1,
                                 stack: '',
                             },
@@ -193,7 +224,19 @@
                                 data: monthlyInstallmentsDataLast12Months.values,
                                 backgroundColor: 'rgba(255, 99, 132, 0.6)',
                                 borderColor: 'rgba(255, 99, 132, 1)',
-                                borderWidth: 1
+                                borderWidth: 1,
+
+                                backgroundColor: monthlyInstallmentsDataLast12Months.values.map((_, index) =>
+                                    index === monthlyInstallmentsDataLast12Months.values.length - 1
+                                        ? 'rgba(255, 99, 132, 0.1)'
+                                        : 'rgba(255, 99, 132, 0.6)'
+                                ),
+
+                                borderColor: monthlyInstallmentsDataLast12Months.values.map((_, index) =>
+                                    index === monthlyInstallmentsDataLast12Months.values.length - 1
+                                        ? 'rgba(255, 99, 132, 1)'
+                                        : 'rgba(255, 99, 132, 1)'
+                                ),
                             },
                             {
                                 type: 'bar',
@@ -201,7 +244,19 @@
                                 data: monthlyPaymentAllocationsDataLast12Months.values,
                                 backgroundColor: 'rgba(54, 162, 235, 0.6)',
                                 borderColor: 'rgba(54, 162, 235, 1)',
-                                borderWidth: 1 
+                                borderWidth: 1,
+                                
+                                backgroundColor: monthlyPaymentAllocationsDataLast12Months.values.map((_, index) =>
+                                    index === monthlyPaymentAllocationsDataLast12Months.values.length - 1
+                                        ? 'rgba(54, 162, 235, 0.2)'
+                                        : 'rgba(54, 162, 235, 0.6)'
+                                ),
+
+                                borderColor: monthlyPaymentAllocationsDataLast12Months.values.map((_, index) =>
+                                    index === monthlyPaymentAllocationsDataLast12Months.values.length - 1
+                                        ? 'rgba(54, 162, 235, 1)'
+                                        : 'rgba(54, 162, 235, 1)'
+                                ),
                             },
                         ]
                     },

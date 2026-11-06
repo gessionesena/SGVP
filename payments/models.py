@@ -7,6 +7,7 @@ from customers.models import Customer
 PAYMENT_METHOD_CHOICES = (
     ('PIX', 'Pix'),
     ('DINHEIRO', 'Dinheiro'),
+    ('DEPOSITO', 'Deposito'),
 )
 
 
